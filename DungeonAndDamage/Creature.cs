@@ -1,6 +1,6 @@
 ﻿namespace DungeonAndDamege;
 
-public class Creature {
+public abstract class Creature {
     public Creature() {}
     public Creature(string name, int health, int damage) {
         Name = name;
@@ -19,16 +19,13 @@ public class Creature {
     
     public int Health {
         get { return health; }
-        private set { health = value; }
+        protected set { health = value; }
     }
     
     public int Damage {
         get { return damage; }
-        private set { damage = value; }
+        protected set { damage = value; }
     }
-
-    public int doDamage(int damage) {
-        Health -= damage;
-        return Health;
-    }
+    
+    public abstract void ApplyDamage(int damage);
 }

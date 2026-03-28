@@ -12,4 +12,8 @@ public class Enemy : Creature {
         get { return reward; }
         private set { reward = value; }
     }
+    
+    public override void ApplyDamage(int damage) {
+        Health -= damage;
+    }
 }
