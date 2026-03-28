@@ -5,6 +5,7 @@ public class Teammate : Creature {
         Armour = armour;
         MaxHealth = health;
         MaxArmour = armour;
+        Salary = salary;
     }
 
     private int armour;
@@ -37,7 +38,7 @@ public class Teammate : Creature {
     
     public bool Alive {
         get => alive;
-        private set => alive = value;
+        set => alive = value;
     }
 
     public void Heal(int health, int armour) {

@@ -45,7 +45,7 @@ class Program {
         }
         
         // Главный цикл игры
-        string[] locations = new string[] {"Главная площадь", "Таверна", "Лекрь", "Церковь", "Ворота" };
+        string[] locations = new string[] {"Главная площадь", "Таверна", "Больница", "Церковь", "Ворота" };
         byte current_location = 0;
 
         string[] map = new string[] { "Поля", "Склизкая пещера", "Лес", "Пристанище гоблинов", "Пещера драконов" };
@@ -112,9 +112,7 @@ class Program {
                     player.Gold += 1000f;
                 }
                 
-            } 
-            
-            while(current_location == 1){
+            } else if(current_location == 1){
                 Console.Write("Вы дошли до таверны!\nВ ней много людей но среди них есть выделяющиеся\nВыберите действие:\n1. Осмотреться\n2. Уйти" +
                               "\nВаше действие >> ");
                 
@@ -168,6 +166,8 @@ class Program {
                             
                             player.teammates.Add(new Teammate(teammate_name, person_storage[choisenTeammate].Health, person_storage[choisenTeammate].Damage, person_storage[choisenTeammate].Armour, person_storage[choisenTeammate].Salary));
                             Console.WriteLine("Вы заплатили ему {0} золотых и теперь он находится в вашей армии!", person_storage[choisenTeammate].Salary * 2);
+                            
+                            player.Salary(- person_storage[choisenTeammate].Salary * 2);
                         }
                     }
                     else {
@@ -183,6 +183,140 @@ class Program {
                     Console.WriteLine("Ваш выбор не правильный! Попробуйте ввести число заново."); 
                     continue;
                 }
+            } else if (current_location == 2) {
+                Console.Write("Вы заходите в лечебницу, в нос ударил сильный запах спирта, а на входе вас встретил врач\n" +
+                              "Выберите действие:\n" +
+                              "1. Лечение\n" +
+                              "2. Уйти\n" +
+                              "Выбор >> ");
+                try {userChoice = int.Parse(Console.ReadLine());}
+                catch {Console.WriteLine("Ваш выбор не правильный! Попробуйте ввести число заново."); continue;}
+
+                if (userChoice == 1) {
+                    if (player.teammates.Count == 0) {
+                        Console.WriteLine("В вашем отряде нет бойцов!");
+                        continue;
+                    }
+                    
+                    Console.WriteLine("Выберите бойца которого хотите излечить:");
+                    for (int i = 0; i < player.teammates.Count; i++) {
+                        if (player.teammates[i] == null) {
+                            Console.WriteLine("Слот {0}: Пусто", i);
+                        }
+                        else {
+                            Console.WriteLine("Слот {0}: {1}, Здоровье: {2}/{3}", i, 
+                                player.teammates[i].Name, 
+                                player.teammates[i].Health, 
+                                player.teammates[i].MaxHealth);
+                        }
+                    }
+                    Console.Write("Выбор >> ");
+
+                    byte healChoice;
+                    try {healChoice = byte.Parse(Console.ReadLine());}
+                    catch {Console.WriteLine("Ваш выбор не правильный! Попробуйте ввести число заново."); continue;}
+                    
+                    Console.Write("Лечение обойдется в 1 золотой\nЛечить?\n1. Лечить\n2. Уйти\nВыбор >>");
+
+                    byte healConfirm;
+                    try {healConfirm = byte.Parse(Console.ReadLine());}
+                    catch {Console.WriteLine("Ваш выбор не правильный! Попробуйте ввести число заново."); continue;}
+
+                    if (healChoice == 1) {
+                        if (player.Gold < 1f) {
+                            Console.WriteLine("В вашем кармане нет стольбко золота!");
+                            continue;
+                        }
+                        player.Salary(-1f);
+                        int toHeal = player.teammates[healChoice].MaxHealth - player.teammates[healChoice].Health;
+                        player.teammates[healChoice].Heal(toHeal);
+                        
+                        Console.WriteLine("Персонаж {0} был вылечен на {1} едениц", player.teammates[healChoice].Name, toHeal);
+                    } if(userChoice == 2) {
+                        continue;
+                    }
+                    else {
+                        Console.WriteLine("Ваш выбор не правильный! Попробуйте ввести число заново."); 
+                        continue;
+                    }
+                }
+                else if(userChoice == 2) {
+                    Console.WriteLine("Вы покинули больницу");
+                    current_location = 0;
+                    break;
+                }
+                else {
+                    Console.WriteLine("Ваш выбор не правильный! Попробуйте ввести число заново."); 
+                    continue;
+                }
+            } else if (current_location == 3) {
+                Console.Write("Вы заходите в старое здание, где по середине видите людей \n" +
+                              "в старых балахонах и бормочащих на непонятном вам языке,\n" +
+                              "Кажется что они могут вам чемто помочь." +
+                              "\n1. Возрадить персонажа" +
+                              "\n2. Уйти" +
+                              "\nВыбор >> ");
+                try {userChoice = int.Parse(Console.ReadLine());}
+                catch {Console.WriteLine("Ваш выбор не правильный! Попробуйте ввести число заново."); continue;}
+
+                if (userChoice == 1) {
+                    List<Teammate> tempDeath = new List<Teammate>();
+
+                    foreach (Teammate mate in player.teammates) {
+                        if (!mate.Alive) {
+                            tempDeath.Add(mate);
+                            
+                        }
+                    }
+
+                    if (tempDeath.Count == 0) {
+                        Console.WriteLine("Все ваши бойцы живы!");
+                        continue;
+                    }
+                    
+                    Console.WriteLine("Жрецы предлагают ожиаить бойца за 5 золотых:");
+                    for (int i = 0; i < tempDeath.Count; i++) {
+                        Console.Write("{0}. {1}", i+1, tempDeath[i].Name);
+                    }
+                    Console.WriteLine("Выбор >> ");
+
+                    int respMate;
+                    try {respMate = int.Parse(Console.ReadLine()) - 1;}
+                    catch {Console.WriteLine("Ваш выбор не правильный! Попробуйте ввести число заново."); continue;}
+
+                    if (respMate < 0 || respMate > tempDeath.Count - 1) {
+                        Console.WriteLine("Нет такого бойца!");
+                        continue;
+                    }
+
+                    if (player.Gold < 5) {
+                        Console.WriteLine("В вашем кармане нет стольбко золота!");
+                        continue;
+                    }
+                    
+                    player.Salary(-5);
+                    int index = player.teammates.IndexOf(tempDeath[respMate]);
+                    player.teammates[index].Alive = true;
+                    
+                    Console.WriteLine("Боец {0} был возражден", player.teammates[index].Name);
+                    continue;
+                    
+                } else if(userChoice == 2) {
+                    Console.WriteLine("Вы покинули церковь");
+                    current_location = 0;
+                    break;
+                }
+                else {
+                    Console.WriteLine("Ваш выбор не правильный! Попробуйте ввести число заново."); 
+                    continue;
+                }
+            } else if (current_location == 4) {
+                if (player.teammates.Count == 0) {
+                    Console.WriteLine("В вашем отряде нет бойцов, идите в таверну и наймите их!");
+                    current_location = 0;
+                }
+                
+                
             }
         }
     }
